@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수리논술 랜딩 — 프로젝트 현황 & 데이터 인수인계 (내부용)</title>
+<style>
+  body { font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; color: #1a1e26; line-height: 1.7; word-break: keep-all; }
+  h1 { font-size: 26px; border-bottom: 3px solid #3b5bfd; padding-bottom: 10px; }
+  h2 { font-size: 19px; margin-top: 40px; color: #3b5bfd; }
+  h3 { font-size: 16px; margin-top: 24px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 12px 0; }
+  th, td { border: 1px solid #dde2ea; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #f2f5fa; }
+  code, pre { background: #f2f5fa; border-radius: 6px; font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+  code { padding: 2px 6px; }
+  pre { padding: 14px 16px; overflow-x: auto; line-height: 1.5; }
+  .done { color: #1a7f37; font-weight: 700; }
+  .todo { color: #b45309; font-weight: 700; }
+  .warn { background: #fef3e2; border-left: 4px solid #b45309; padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; }
+  .note { font-size: 13px; color: #5a6372; }
+</style>
+</head>
+<body>
+
+<h1>📋 수리논술 랜딩 — 프로젝트 현황 (내부용, 배포 금지)</h1>
+<p class="note">최종 갱신: 2026-07-03 · 이 파일은 다음 작업 세션(사람이든 Claude든)이 맥락을 바로 잡기 위한 인수인계 문서입니다.
+새 세션에서 Claude에게 <b>"PROJECT_STATUS.html 읽고 시작해"</b>라고 하면 됩니다.</p>
+
+<h2>1. 프로젝트가 뭔가</h2>
+<p>수리논술 첨삭 사업의 <b>정적 랜딩 페이지</b>. 차별화 포인트 두 가지:</p>
+<ol>
+  <li><b>학교별 기출 DB + 출제 경향</b> — 검색 유입("연세대 수리논술 기출" 류)이 목표.
+      차별화는 <b>원장 첨삭 데이터 기반 "등급대별 완답률"</b> 표기(경쟁자가 못 베끼는 지표).</li>
+  <li><b>수시 6장 조합 시뮬레이터</b> — 시험일 겹침 체크, 오전/오후 분산·이동 동선, 유형 유사도(준비 시너지),
+      4개 이상 선택 시 남은 카드 추천. URL 해시(<code>#s=yonsei,korea,...</code>)로 조합 공유 → 커뮤니티 바이럴 목표.</li>
+</ol>
+
+<h2>2. 파일 구조</h2>
+<table>
+  <tr><th>파일</th><th>역할</th></tr>
+  <tr><td><code>index.html</code></td><td>페이지 뼈대 (히어로 → 시뮬레이터 → 기출 DB → 푸터)</td></tr>
+  <tr><td><code>style.css</code></td><td>스타일 (모바일 반응형 완료)</td></tr>
+  <tr><td><code>data.js</code></td><td><b>⭐ 단일 데이터 소스.</b> 대학·시험일·최저·유사도·기출 전부 여기. 데이터 갱신 = 이 파일만 수정</td></tr>
+  <tr><td><code>app.js</code></td><td>시뮬레이터·DB 렌더링 로직. 데이터 갱신 시 건드릴 필요 없음</td></tr>
+  <tr><td><code>PROJECT_STATUS.html</code></td><td>이 문서 (내부용 — 배포 시 제외할 것)</td></tr>
+</table>
+<p>프레임워크 없음. <code>index.html</code> 더블클릭으로 로컬 확인, 아무 정적 호스팅에나 폴더째 업로드하면 배포 끝.</p>
+
+<h2>3. 데이터 현황 — 뭐가 채워졌고 뭐가 비었나</h2>
+<table>
+  <tr><th>데이터</th><th>상태</th><th>위치 (data.js)</th><th>비고</th></tr>
+  <tr><td>2027 시험일 (날짜 단위)</td><td class="done">수집 완료(잠정)</td><td><code>SCHOOLS[].exams[].dates</code></td><td>2026-07-02 입시학원 블로그 5곳 교차 수집. <code>confirmed:false</code> = 출처 상충/미발표</td></tr>
+  <tr><td>오전/오후 고사 시간</td><td class="todo">거의 전부 비어있음</td><td><code>exams[].session</code></td><td>모집요강·수험표 공지 후 입력. null이면 UI가 "시간 미공개" 처리</td></tr>
+  <tr><td>수능최저 상세</td><td class="done">주요 대학 수집(참고치)</td><td><code>MIN_DETAIL</code> 맵</td><td>인문/대표 기준. 자연·의약학 별도 기준 미수집. null = "확인중" 표시</td></tr>
+  <tr><td>출제 경향 분석</td><td class="todo">전부 비어있음 — <b>원장 제공 예정</b></td><td><code>SCHOOLS[].tendency</code></td><td>문자열 넣으면 그대로 표시, null이면 "준비 중" 문구</td></tr>
+  <tr><td>기출 × 완답률</td><td class="todo">전부 비어있음 — <b>원장 첨삭 데이터로 제공 예정</b></td><td><code>SCHOOLS[].pastStats</code></td><td>아래 4번 스키마 참고. null이면 "집계중" 뱃지</td></tr>
+  <tr><td>유형 유사도 원료</td><td class="todo">임시 추정치 (Claude가 통념 기반으로 채움)</td><td><code>SCHOOLS[].style / .scope</code></td><td>원장 경향 데이터 받으면 교체할 것. 페이지에도 "추정치" 명시됨</td></tr>
+</table>
+
+<div class="warn"><b>⚠ 반드시 재확인 필요한 항목 (출처 상충)</b><br>
+· <b>고려대·서강대·성균관대·경희대</b>: 11/21(토)~22(일) 중 계열별 날짜가 출처마다 다름 → 두 날짜 모두 잠재 충돌로 처리해둠<br>
+· <b>중앙대(일반)</b>: 수능최저 "폐지"(2026.2월 자료) vs "3합 6 유지"(2026.6월 자료) 상충<br>
+· <b>성신여대</b>(10/3 vs 10/4), <b>을지대</b>(10/16~18), <b>인하대 자연</b>(12/5 vs 12/6), <b>국민대</b>(12/5~6), <b>가천대</b>(11/29~12/1 지정일)<br>
+→ 2026년 8~9월 각 대학 공식 수시 모집요강 발표 후 <code>data.js</code>에서 <code>confirmed:true</code>로 바꾸고 날짜 확정할 것</div>
+
+<h2>4. 데이터 넣는 방법 (원장이 자료 주면 이대로)</h2>
+<h3>완답률 (pastStats)</h3>
+<pre>// data.js 해당 학교 항목의 pastStats: null 을 아래처럼 교체
+pastStats: [
+  { year: 2026, problems: [
+    { no: '1-1', topic: '미적분·접선의 활용', full: 34, byGrade: { 1: 71, 2: 52, 3: 28 } },
+    { no: '1-2', topic: '수열의 극한',       full: null, byGrade: null },  // 집계 안 된 건 null
+  ]},
+]</pre>
+<h3>출제 경향 (tendency)</h3>
+<pre>tendency: '최근 5개년 미적분 비중 60%. 증명 요구 문항이 매년 1개 이상. 소문항 유도형 구조...'</pre>
+<h3>고사 시간 (session)</h3>
+<pre>exams: [{ track: '자연', dates: ['2026-11-21'], session: '오후', confirmed: true, note: null }]</pre>
+<p class="note">넣고 브라우저 새로고침만 하면 UI에 자동 반영됨 (빌드 과정 없음).</p>
+
+<h2>5. 수집 출처 기록 (2026-07-02)</h2>
+<ul class="note">
+  <li>시험일: 한양학원 부평(blog.naver.com/hanyangbupyung/224313187576, 일자별 표), 아르케랩(arche_labb/224310088007), 목동키(mokdongkey/224310908837), hamamath_(224326734496)</li>
+  <li>확정 개별: 광운대(icarusnonsul/224324679507 — 자연 11/28·인문 11/29·최저X·논술80+교과20), 숭실대(mademaths/224324298064 — 11/21·논술90+교과10), 인하대 인문 12/5(radixnonsul)</li>
+  <li>수능최저: 코어스터디(smi0413/224313675642 — 2027 최저 총정리), 목동키 "2027 중앙대 논술 최저 폐지"(2026.2.14 게시)</li>
+  <li>2027 수능일: 2026-11-19(목) / 논술 42~44개 대학, 12,712~12,783명 (출처별 상이)</li>
+</ul>
+
+<h2>6. 다음 할 일 (우선순위순)</h2>
+<ol>
+  <li class="todo">원장 → 학교별 출제 경향 + 첨삭 완답률 데이터 제공 → <code>tendency</code>/<code>pastStats</code> 입력</li>
+  <li class="todo">8~9월 모집요강 발표 후: 미확정 날짜 확정, 오전/오후 시간 입력, 최저 자연계 기준 보강, <code>confirmed:true</code> 전환</li>
+  <li>브랜드명 확정 (현재 임시 "수리논술LAB")
+    <br><span class="note">✅ 상담 CTA는 2026-07-03 추가됨: <code>#contact</code> 섹션 폼 → mailto로
+    <code>META.contactEmail</code>(data.js, 현재 dream152789@gmail.com)에 발송 + 내용 복사 버튼.
+    시뮬레이터 선택 조합이 신청 내용에 자동 포함. 6장 완료 박스·기출 DB 상세에도 상담 유도 링크 있음.
+    구글폼/Formspree로 바꾸려면 app.js의 <code>contactForm</code> submit 핸들러만 교체하면 됨.</span></li>
+  <li>배포 (Netlify/Vercel/GitHub Pages 아무거나 — 이 파일은 제외) + OG 태그/파비콘</li>
+  <li>유형 유사도 <code>style</code>/<code>scope</code> 값을 원장 데이터 기반으로 교체</li>
+</ol>
+
+<p class="note">— 작성: Claude Code (2026-07-02 세션). 갱신할 때 이 문서의 날짜와 현황 표도 같이 업데이트할 것.</p>
+</body>
+</html>

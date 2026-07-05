@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2027 수리논술 조합 시뮬레이터 & 학교별 기출 DB</title>
+<meta name="description" content="2027학년도 수리논술 실시 대학 시험일 겹침 체크, 6개 조합 시뮬레이터, 학교별 기출문제 DB와 첨삭 데이터 기반 출제 경향 분석">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="logo">수리논술<span>LAB</span></div>
+    <nav>
+      <a href="#simulator">조합 시뮬레이터</a>
+      <a href="#db">기출 DB · 경향</a>
+      <a href="#contact" class="nav-cta">상담 신청</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="hero-badge">2027학년도 수시 대비</p>
+    <h1>수시 6장, <em>겹치는 조합</em>으로<br>한 장을 버리고 계신가요?</h1>
+    <p class="hero-sub">
+      수능일(2026.11.19) 직후 첫 주말에만 9개 대학 논술이 몰립니다.<br>
+      시험일 충돌 · 유형 유사도 · 이동 동선까지 한 번에 확인하세요.
+    </p>
+    <div class="hero-cta">
+      <a class="btn primary" href="#simulator">내 조합 점검하기</a>
+      <a class="btn ghost" href="#db">학교별 기출 보기</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 조합 시뮬레이터 ===================== -->
+<section id="simulator" class="section">
+  <div class="wrap">
+    <h2>6개 조합 시뮬레이터</h2>
+    <p class="section-desc">
+      지원을 고민 중인 대학을 선택하세요(최대 6개).
+      시험일 겹침, 오전/오후 분산 가능 여부, 준비 시너지(유형 유사도)를 즉시 분석하고
+      <strong>4개 이상 선택 시 남은 카드에 어울리는 대학을 추천</strong>합니다.
+    </p>
+
+    <div class="filters" id="filters">
+      <div class="filter-group">
+        <span class="filter-label">시기</span>
+        <button class="chip-filter active" data-filter="period" data-value="all">전체</button>
+        <button class="chip-filter" data-filter="period" data-value="before">수능 전</button>
+        <button class="chip-filter" data-filter="period" data-value="after">수능 후</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">유형</span>
+        <button class="chip-filter active" data-filter="format" data-value="all">전체</button>
+        <button class="chip-filter" data-filter="format" data-value="심층">심층 수리논술</button>
+        <button class="chip-filter" data-filter="format" data-value="약술">약술형</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">수능최저</span>
+        <button class="chip-filter active" data-filter="min" data-value="all">전체</button>
+        <button class="chip-filter" data-filter="min" data-value="없음">최저 없음</button>
+      </div>
+    </div>
+
+    <div class="sim-layout">
+      <div class="school-pool">
+        <div id="schoolGroups"></div>
+      </div>
+
+      <div class="sim-result">
+        <div class="slots-bar">
+          <div class="slots" id="slots"></div>
+          <button class="btn small ghost" id="clearBtn">초기화</button>
+        </div>
+
+        <div id="analysis" class="analysis">
+          <p class="empty-hint">👈 대학을 선택하면 여기에 분석 결과가 나타납니다.</p>
+        </div>
+
+        <div id="recommend" class="recommend"></div>
+
+        <div class="share-row" id="shareRow" hidden>
+          <button class="btn primary small" id="copyLinkBtn">조합 링크 복사</button>
+          <button class="btn ghost small" id="copyTextBtn">결과 텍스트 복사</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="disclaimer">
+      ⚠ 시험 일정은 2026.7.2 기준 수집 자료이며, 일부 대학은 계열별 날짜·시간이 미확정입니다.
+      <strong>반드시 각 대학 모집요강으로 최종 확인하세요.</strong>
+      <span class="badge warn">확인 필요</span> 표시는 출처 간 불일치 또는 미발표 항목입니다.
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 기출 DB ===================== -->
+<section id="db" class="section alt">
+  <div class="wrap">
+    <h2>학교별 기출 DB + 출제 경향</h2>
+    <p class="section-desc">
+      기출문제는 어디에나 있습니다. 여기엔 <strong>실제 첨삭 답안 데이터로 집계한
+      "등급대별 완답률"</strong>이 붙습니다. 이 문제를 몇 등급대 학생이 몇 %나 완답하는지 —
+      다른 곳에서는 볼 수 없는 난이도 지표입니다. <span class="badge soon">순차 공개 중</span>
+    </p>
+    <div class="db-search">
+      <input type="text" id="dbSearch" placeholder="대학명 검색 (예: 연세, 한양...)">
+    </div>
+    <div id="dbGrid" class="db-grid"></div>
+  </div>
+</section>
+
+<!-- ===================== 상담 신청 CTA ===================== -->
+<section id="contact" class="section contact">
+  <div class="wrap">
+    <h2>수리논술 상담 신청</h2>
+    <p class="section-desc">
+      6장 조합 설계, 학교별 대비 전략, 첨삭 문의 — 무엇이든 남겨주세요.
+      시뮬레이터에서 조합을 선택한 상태라면 <strong>선택한 조합이 신청 내용에 자동으로 담깁니다.</strong>
+    </p>
+
+    <form id="contactForm" class="contact-form">
+      <div class="form-row">
+        <label>이름 (호칭)
+          <input type="text" id="cfName" placeholder="예: 김○○ 학생 / 학부모" required>
+        </label>
+        <label>연락처
+          <input type="text" id="cfPhone" placeholder="전화번호 또는 카카오톡 ID" required>
+        </label>
+      </div>
+      <label><span>학년 · 성적대 <span class="opt">(선택)</span></span>
+        <input type="text" id="cfGrade" placeholder="예: 고3 · 수학 모의 2등급">
+      </label>
+      <label>상담 내용
+        <textarea id="cfMsg" rows="4" placeholder="예: 수능 후 첫 주말에 3개가 겹치는데 어떤 조합이 나을지 고민입니다."></textarea>
+      </label>
+
+      <div class="contact-note" id="cfCombo" hidden></div>
+
+      <div class="contact-actions">
+        <button type="submit" class="btn primary">📩 상담 신청 메일 보내기</button>
+        <button type="button" class="btn ghost" id="cfCopyBtn">신청 내용 복사</button>
+      </div>
+      <p class="contact-hint">
+        메일 앱이 열리지 않는 환경이라면 <b>신청 내용 복사</b> 후
+        <b id="cfEmail"></b> 로 직접 보내주세요.
+      </p>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>본 페이지의 시험 일정은 2026년 7월 기준 공개 자료를 수집·정리한 것으로, 대학 사정에 따라 변경될 수 있습니다.<br>
+    지원 전 반드시 각 대학의 2027학년도 수시모집요강 및 입학처 공지를 확인하세요.</p>
+    <p class="copy">© 2026 수리논술LAB</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="exam_data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
